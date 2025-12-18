@@ -1,0 +1,81 @@
+﻿#include "audiomanager.h"
+#include <QSoundEffect>
+#include <QUrl>
+
+
+AudioManager::AudioManager(QObject *parent)
+    : QObject{parent}
+{
+    // 新方案直接根据按键生成随机选择音效文件的播放器，确保不会连续调用同一播放器
+    // 多种音效的文件列表
+    QVector<QUrl> KeySoundUrls;
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey01.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey02.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey03.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey04.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey05.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey06.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey07.wav"));
+
+    QVector<QUrl> SuccessSoundUrls;
+    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓完的战备启动音效/SuccessSound01.wav"));
+    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓完的战备启动音效/SuccessSound02.wav"));
+    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓完的战备启动音效/SuccessSound03.wav"));
+    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓完的战备启动音效/SuccessSound04.wav"));
+
+    QVector<QUrl> FailureSoundUrls;
+    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓球取消音效/FailureSound01.wav"));
+    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓球取消音效/FailureSound02.wav"));
+    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓球取消音效/FailureSound03.wav"));
+    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓球取消音效/FailureSound04.wav"));
+
+    // 文件柜逻辑，把上面那些列表都装进QMap里
+    m_soundMap[KeyPress] = KeySoundUrls;
+    m_soundMap[MatchSuccess] = SuccessSoundUrls;
+    m_soundMap[MatchFailure] = FailureSoundUrls;    
+
+}
+
+// 按键播放音效的方法
+void AudioManager::playKeyPressSound(SoundType type)
+{
+    // 检查文件柜有无这个类型的地址列表
+    if (!m_soundMap.contains(type))
+    {
+        return;
+    }
+    // 拿出对应URL列表
+    const  QVector<QUrl>& urlList = m_soundMap[type];
+    // 确保里面有东西
+    if (urlList.isEmpty())
+    {
+        return;
+    }
+    // 创建 QSoundEffect 实例
+    QSoundEffect *soundPlayer = new QSoundEffect(this);
+    // 随机选择一个音效 URL
+    int randomIndex = QRandomGenerator::global()->bounded(urlList.size());
+    const QUrl &randomSoundUrl = urlList.at(randomIndex);
+    // 设置音源、音量，然后立即播放
+    soundPlayer->setSource(randomSoundUrl);
+    soundPlayer->setVolume(2);
+    soundPlayer->play();
+    // 将新的播放器指针登记到活跃列表中
+    m_activeSounds.append(soundPlayer);
+
+}
+
+// 销毁所有活跃的音效播放器，释放内存
+void AudioManager::clearActiveSounds()
+{
+    // 销毁所有活跃的音效播放器
+    for (const auto &sound : m_activeSounds)
+    {
+        sound->deleteLater();
+    }
+    m_activeSounds.clear(); // 清空列表，为下一次输入做准备
+}
+
+
+
+

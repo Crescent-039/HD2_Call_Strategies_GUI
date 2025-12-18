@@ -1,0 +1,23 @@
+.project
+
+# Visual Studion tiedostoja
+*/[Ee]xported[Oo]bj/
+*.booproj
+*.pidb
+*.suo
+*.svd
+*.user
+*.userprefs
+bin/
+obj/
+.vs/
+Compiled/
+Compiled*/
+
+# Dolphin
+.directory
+.idea
+__pycache__
+# run
+绝地潜兵2搓球音效/
+StrategyGifs/

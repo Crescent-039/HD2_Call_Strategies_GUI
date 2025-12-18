@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(ui->ArrowContainer->layout());
     if (layout)
     {
-        // 设置布局的对齐方式为：靠左对齐
+        // 设置布局的对齐方式为：中心对齐
         layout->setAlignment(Qt::AlignHCenter);
         // 强制设置固定间距
         layout->setSpacing(6);
@@ -184,7 +184,11 @@ MainWindow::~MainWindow()
 首先学一下开局代码的逻辑  QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(ui->ArrowContainer->layout());
 用QHBoxLayout* layout声明一个指向QHBoxLayout类型对象的指针，然后用qobject_cast，这算是个专门用于 QObject 及其子类 之间进行动态类型转换的模板函数
 <QHBoxLayout*>，让qobject_cast鉴定(ui->ArrowContainer->layout())是不是QHBoxLayout*水平布局，括号里的是传给他的实际东西，是ui里的ArrowContainer模块里面的layout信息
+这一步的目的是找到布局方式，下面开始判断，强制设置布局方式为中心对齐，然后设置间距
 
+下一步设置窗口颜色，为当前窗口部件创建一个当前的调色板QPalette的副本，并将其存储在一个名为 palette 的局部变量中
+当一个对象调用自己的成员函数时，编译器会把这个对象的地址作为参数传递给该函数，这个地址就被存放在 this 指针里，也就是说这里的this是指针
+this->palette()则是，获取this指针指向的对象实例，然后调用指向的这个对象的palette()函数，其实就是调用自己的palette()，因为自己也就是主窗口就是继承自QObject
 
 
 

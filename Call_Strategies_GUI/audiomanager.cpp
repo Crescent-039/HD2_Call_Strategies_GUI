@@ -9,25 +9,25 @@ AudioManager::AudioManager(QObject *parent)
     // 新方案直接根据按键生成随机选择音效文件的播放器，确保不会连续调用同一播放器
     // 多种音效的文件列表
     QVector<QUrl> KeySoundUrls;
-    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey01.wav"));
-    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey02.wav"));
-    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey03.wav"));
-    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey04.wav"));
-    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey05.wav"));
-    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey06.wav"));
-    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/按键音效/DirectionKey07.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/KeySound/DirectionKey01.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/KeySound/DirectionKey02.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/KeySound/DirectionKey03.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/KeySound/DirectionKey04.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/KeySound/DirectionKey05.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/KeySound/DirectionKey06.wav"));
+    KeySoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/KeySound/DirectionKey07.wav"));
 
     QVector<QUrl> SuccessSoundUrls;
-    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓完的战备启动音效/SuccessSound01.wav"));
-    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓完的战备启动音效/SuccessSound02.wav"));
-    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓完的战备启动音效/SuccessSound03.wav"));
-    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓完的战备启动音效/SuccessSound04.wav"));
+    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/ActivateSound/SuccessSound01.wav"));
+    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/ActivateSound/SuccessSound02.wav"));
+    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/ActivateSound/SuccessSound03.wav"));
+    SuccessSoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/ActivateSound/SuccessSound04.wav"));
 
     QVector<QUrl> FailureSoundUrls;
-    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓球取消音效/FailureSound01.wav"));
-    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓球取消音效/FailureSound02.wav"));
-    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓球取消音效/FailureSound03.wav"));
-    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/绝地潜兵2搓球音效/搓球取消音效/FailureSound04.wav"));
+    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/CancelSound/FailureSound01.wav"));
+    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/CancelSound/FailureSound02.wav"));
+    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/CancelSound/FailureSound03.wav"));
+    FailureSoundUrls.append(QUrl::fromLocalFile(":/sounds/HD2Sound/CancelSound/FailureSound04.wav"));
 
     // 文件柜逻辑，把上面那些列表都装进QMap里
     m_soundMap[KeyPress] = KeySoundUrls;

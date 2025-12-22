@@ -28,7 +28,7 @@ public:
     // 工具类就该用静态方法
     // 静态方法：播放箭头脉冲动画
     // 参数：需要播放动画的 QLabel 列表，和一个父对象用于管理动画生命周期
-    static void PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, QObject* parent);
+    static void PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, const QColor& pulseColor, QObject* parent);
 
     // 静态方法：播放战备GIF
     // 参数：显示GIF的QLabel，控制GIF的QMovie，以及战备名

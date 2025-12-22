@@ -35,12 +35,14 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
+
 private slots: // Qt特有的关键字，专门用于声明槽函数
     void clearInputSequence();
     void onMatchSuccess(const QString &strategyName);
     void onMatchFailed();
     void onInputAccepted(Direction dir); // 用来画箭头
     void delayclearAudio();
+    void delayclearArrow();
 
 private:
     Ui::MainWindow *ui;
@@ -52,6 +54,7 @@ private:
     InputMatchingLogic *m_inputMatchingLogic;
 
     QTimer *m_delayClearAudio;
+    QTimer *m_delayClearArrow;
     bool m_isInputLocked;
 
     QMovie *m_strategyMovie;

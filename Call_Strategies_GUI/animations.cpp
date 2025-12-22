@@ -7,30 +7,35 @@ Animations::Animations()
 }
 
 // 播箭头动画
-void Animations::PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, QObject* parent)
+void Animations::PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, const QColor& pulseColor, QObject* parent)
 {
-    if (arrowLabels.isEmpty()) {
+    if (arrowLabels.isEmpty())
+    {
         return;
     }
 
     QParallelAnimationGroup *animationGroup = new QParallelAnimationGroup(parent);
 
-    // 步骤 1: 备份所有原始箭头图片
-    // 我们创建一个 QMap，键是 QLabel 的指针，值是它对应的原始 QPixmap
+    // 备份所有原始箭头图片
+    // 创建一个 QMap，键是 QLabel 的指针，值是它对应的原始 QPixmap
     QMap<QLabel*, QPixmap> originalPixmaps;
-    for (QLabel *label : arrowLabels) {
-        if (const QPixmap* pix = label->pixmap()) { // 安全地获取 pixmap
+    for (QLabel *label : arrowLabels)
+    {
+        if (const QPixmap* pix = label->pixmap())
+        { // 安全地获取 pixmap
             originalPixmaps[label] = *pix;
         }
     }
     const QColor startColor(255, 255, 255, 0);
-    const QColor endColor(0, 255, 255, 255);
+    // const QColor endColor(0, 255, 255, 255);
+    // 使用传入的颜色
+    const QColor endColor = pulseColor;
     animationGroup->setProperty("dummy", startColor); // 随便给个初始值
     QPropertyAnimation *anim = new QPropertyAnimation(animationGroup, "dummy");
     anim->setDuration(800);
 
-    // 步骤 2: 改造 Lambda，让它使用备份好的 QMap
-    // 我们需要捕获 originalPixmaps 这个 map
+    // 用Lambda表达式，让它使用备份好的 QMap
+    // 捕获 originalPixmaps 这个 map
     QObject::connect(anim, &QPropertyAnimation::valueChanged, parent, [originalPixmaps](const QVariant &value){
         QColor currentColor = value.value<QColor>();
 

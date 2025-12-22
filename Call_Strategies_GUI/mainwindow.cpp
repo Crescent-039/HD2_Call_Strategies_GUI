@@ -48,6 +48,10 @@ MainWindow::MainWindow(QWidget *parent)
     m_delayClearAudio = new QTimer(this);
     m_delayClearAudio->setSingleShot(true);
     connect(m_delayClearAudio, &QTimer::timeout, this, &MainWindow::delayclearAudio);
+    // 创建延迟清除箭头的计时器
+    m_delayClearArrow = new QTimer(this);
+    m_delayClearArrow->setSingleShot(true);
+    connect(m_delayClearArrow, &QTimer::timeout, this, &MainWindow::delayclearArrow);
 
 }
 
@@ -65,9 +69,10 @@ void MainWindow::onMatchSuccess(const QString &strategyName)
     //ui->resultLabel->setText(strategyName);
     m_audioManager->playKeyPressSound(AudioManager::MatchSuccess);// 播放音效
     // 上特技
-    Animations::PulseAnimationForArrows(m_arrowLabels, this);
+    Animations::PulseAnimationForArrows(m_arrowLabels, Qt::cyan, this);
     Animations::playStrategyGif(ui->resultLabel, m_strategyMovie, strategyName);
     m_delayClearAudio->start(3000);
+    m_delayClearArrow->start(1500);
     //clearInputSequence(); // 立即清除
 }
 
@@ -75,8 +80,8 @@ void MainWindow::onMatchSuccess(const QString &strategyName)
 void MainWindow::onMatchFailed()
 {
     m_audioManager->playKeyPressSound(AudioManager::MatchFailure);// 播放音效
-    clearInputSequence(); // 立即清除
     m_delayClearAudio->start(3000);// 延迟清理音效
+    clearInputSequence(); // 立即清除
 }
 
 
@@ -89,6 +94,16 @@ void MainWindow::delayclearAudio()
     m_isInputLocked = false;
 }
 
+// 延迟清理箭头的槽函数
+void MainWindow::delayclearArrow()
+{
+    for (QLabel *label : m_arrowLabels)
+    {
+        label->deleteLater();
+    }
+    m_arrowLabels.clear();
+    m_isInputLocked = false;
+}
 
 // 清空输入的槽函数
 void MainWindow::clearInputSequence()

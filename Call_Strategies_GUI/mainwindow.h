@@ -34,6 +34,8 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
 
 
 private slots: // Qt特有的关键字，专门用于声明槽函数
@@ -58,6 +60,7 @@ private:
     bool m_isInputLocked;
 
     QMovie *m_strategyMovie;
+    bool m_isStrategyPanelShown;        //状态锁
 
 };
 #endif // MAINWINDOW_H

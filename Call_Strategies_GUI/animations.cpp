@@ -63,9 +63,15 @@ void Animations::PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, co
     animationGroup->addAnimation(anim);
 
     // 步骤 3: 动画结束后，用备份的 QMap 来恢复
-    QObject::connect(animationGroup, &QParallelAnimationGroup::finished, parent, [originalPixmaps](){
-        for (auto it = originalPixmaps.constBegin(); it != originalPixmaps.constEnd(); ++it) {
-            it.key()->setPixmap(it.value());
+    QObject::connect(animationGroup, &QParallelAnimationGroup::finished, parent, [arrowLabels]()
+    {
+//        for (auto it = originalPixmaps.constBegin(); it != originalPixmaps.constEnd(); ++it)
+//        {
+//            it.key()->setPixmap(it.value());
+//        }
+        for (QLabel *label : arrowLabels)
+        {
+            label->deleteLater(); // 动画结束
         }
     });
 

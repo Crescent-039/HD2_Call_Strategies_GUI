@@ -23,6 +23,11 @@ MainWindow::MainWindow(QWidget *parent)
         layout->setSpacing(6);
     }
 
+    // 初始化状态锁
+    m_isStrategyPanelShown = false;
+    // 隐藏战备面板
+    ui->StrategyPanel->hide();
+
     // 窗口颜色
     QPalette palette = this->palette();
     palette.setColor(QPalette::Window, QColor(32,33,34));
@@ -43,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_inputMatchingLogic, &InputMatchingLogic::sequenceCleared, this, &MainWindow::clearInputSequence);
 
     // 初始化输入锁为 false
-    m_isInputLocked = false;
+    m_isInputLocked = true;
     // 创建延迟清除音效的计时器
     m_delayClearAudio = new QTimer(this);
     m_delayClearAudio->setSingleShot(true);
@@ -72,7 +77,9 @@ void MainWindow::onMatchSuccess(const QString &strategyName)
     Animations::PulseAnimationForArrows(m_arrowLabels, Qt::cyan, this);
     Animations::playStrategyGif(ui->resultLabel, m_strategyMovie, strategyName);
     m_delayClearAudio->start(3000);
-    m_delayClearArrow->start(1500);
+    // 立刻销毁m_arrowLabels，否则会有一堆即将被Animations销毁的空指针
+    m_arrowLabels.clear();
+    //m_delayClearArrow->start(1500);
     //clearInputSequence(); // 立即清除
 }
 
@@ -91,10 +98,11 @@ void MainWindow::delayclearAudio()
     //clearInputSequence();
     // 解锁键盘输入
     m_audioManager->clearActiveSounds();
-    m_isInputLocked = false;
+    //m_isInputLocked = false;
 }
 
-// 延迟清理箭头的槽函数
+// 延迟清理箭头的槽函数，如果在箭头变色动画没播完的时候清理，箭头label已经被销毁
+// 而QPropertyAnimation会试图访问一个已被销毁的label的内存，会导致程序崩溃
 void MainWindow::delayclearArrow()
 {
     for (QLabel *label : m_arrowLabels)
@@ -102,7 +110,8 @@ void MainWindow::delayclearArrow()
         label->deleteLater();
     }
     m_arrowLabels.clear();
-    m_isInputLocked = false;
+    //m_isInputLocked = false;
+    return;
 }
 
 // 清空输入的槽函数
@@ -126,6 +135,21 @@ void MainWindow::clearInputSequence()
 //重写键盘输入事件
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    // 按下CTRL显示战备面板
+    if (event->key() == Qt::Key_Control)
+    {
+        if (!event->isAutoRepeat()&&!m_isStrategyPanelShown)
+        {
+            m_isStrategyPanelShown = true;
+            // 显示面板
+            ui->StrategyPanel->show();
+        }
+        // 只有按下CTRL并且确保上一个战备已经启动之后才能输入战备
+        m_isInputLocked = false;
+        return;
+    }
+
+    // 战备输入逻辑
     if (m_isInputLocked)
     {
         return;
@@ -151,6 +175,31 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     }
 }
 
+//键盘释放事件
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    // 松开CTRL，隐藏战备面板
+    if (event->key() == Qt::Key_Control)
+    {
+        if (!event->isAutoRepeat()&&m_isStrategyPanelShown)
+        {
+            m_isStrategyPanelShown = false;
+            // 显示面板
+            ui->StrategyPanel->hide();
+        }
+        // 松开CTRL，锁定战备输入，并且延迟销毁界面上的箭头
+        if (!m_isInputLocked)
+            {
+                // 如果用户只是输入了一半，然后松开了 CTRL，在这里清理箭头
+                clearInputSequence();
+            }
+
+        m_isInputLocked = true;
+        // m_delayClearArrow->start(1500);
+        return;
+    }
+
+}
 
 // 添加输入的箭头的函数
 void MainWindow::addArrow(Direction dir)

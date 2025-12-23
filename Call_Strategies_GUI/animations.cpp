@@ -6,6 +6,12 @@ Animations::Animations()
 
 }
 
+Animations& Animations::instance()
+{
+    static Animations inst;     // 确保线程安全
+    return inst;
+}
+
 // 播箭头动画
 void Animations::PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, const QColor& pulseColor, QObject* parent)
 {
@@ -63,7 +69,9 @@ void Animations::PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, co
     animationGroup->addAnimation(anim);
 
     // 步骤 3: 动画结束后，用备份的 QMap 来恢复
-    QObject::connect(animationGroup, &QParallelAnimationGroup::finished, parent, [arrowLabels]()
+    // 当动画播放完毕时，animationGroup 会通知 instance，然后 instance 会立刻向整个程序广播 pulseAnimationFinished() 这个信号
+    QObject::connect(animationGroup, &QParallelAnimationGroup::finished, &instance(), &Animations::pulseAnimationFinished);
+                         /*
     {
 //        for (auto it = originalPixmaps.constBegin(); it != originalPixmaps.constEnd(); ++it)
 //        {
@@ -74,7 +82,7 @@ void Animations::PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, co
             label->deleteLater(); // 动画结束
         }
     });
-
+*/
     animationGroup->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
@@ -99,7 +107,6 @@ void Animations::playStrategyGif(QLabel* displayLabel, QMovie* movie, const QStr
         return;
     }
     movie->setSpeed(130);
-    movie->stop();
     movie->setFileName(gifPath);
     movie->start();
 }

@@ -57,6 +57,17 @@ MainWindow::MainWindow(QWidget *parent)
     m_delayClearArrow = new QTimer(this);
     m_delayClearArrow->setSingleShot(true);
     connect(m_delayClearArrow, &QTimer::timeout, this, &MainWindow::delayclearArrow);
+    // 连接 Animations 的信号到回收槽函数
+    connect(&Animations::instance(), &Animations::pulseAnimationFinished, this, &MainWindow::onPulseAnimationFinished);
+
+    // 定义存可调用label的池子大小，由于绝地潜兵2最长的战备为地狱火炸弹，八个箭头，所以这里池子大小定义为10个
+    const int POOL_SIZE = 10;
+    for (int i = 0; i < POOL_SIZE; ++i)
+    {
+        QLabel *arrow = new QLabel(this);
+        arrow->hide();      // 创建出来后隐藏
+        m_availableArrows.append(arrow);        // 留在内存里等待被放进ArrowContainer里
+    }
 
 }
 
@@ -78,9 +89,9 @@ void MainWindow::onMatchSuccess(const QString &strategyName)
     Animations::playStrategyGif(ui->resultLabel, m_strategyMovie, strategyName);
     m_delayClearAudio->start(3000);
     // 立刻销毁m_arrowLabels，否则会有一堆即将被Animations销毁的空指针
-    m_arrowLabels.clear();
-    //m_delayClearArrow->start(1500);
-    //clearInputSequence(); // 立即清除
+    // 同时将箭头回收利用
+    // 不再需要 m_delayClearArrow，也不需要立刻 clear 列表了
+    // 动画结束后会自动通过信号回调 onPulseAnimationFinished() 来处理回收。
 }
 
 // 匹配失败
@@ -91,6 +102,17 @@ void MainWindow::onMatchFailed()
     clearInputSequence(); // 立即清除
 }
 
+
+// 战备匹配成功后箭头动画播完的回收箭头函数，这里另写一个是为了接受动画播完的信号
+void MainWindow::onPulseAnimationFinished()
+{
+    for (QLabel *label : m_arrowLabels) {
+        ui->ArrowContainer->layout()->removeWidget(label);
+        label->hide();
+        m_availableArrows.prepend(label);
+    }
+    m_arrowLabels.clear();
+}
 
 // 延迟清理音效的槽函数
 void MainWindow::delayclearAudio()
@@ -107,7 +129,13 @@ void MainWindow::delayclearArrow()
 {
     for (QLabel *label : m_arrowLabels)
     {
-        label->deleteLater();
+        //label->deleteLater();
+        // 从布局中移除但不销毁
+        ui->ArrowContainer->layout()->removeWidget(label);
+        // 隐藏
+        label->hide();
+        // 放回空闲仓库
+        m_availableArrows.append(label);
     }
     m_arrowLabels.clear();
     //m_isInputLocked = false;
@@ -115,19 +143,25 @@ void MainWindow::delayclearArrow()
 }
 
 // 清空输入的槽函数
+// 修改clearInputSequence，不再deleteLater任何东西，而是把使用中的箭头放回待命的箭头容器中
 void MainWindow::clearInputSequence()
 {
     for (QLabel *label : m_arrowLabels)
     {
-        label->deleteLater();
+        //label->deleteLater();
+        // 从布局中移除但不销毁
+        ui->ArrowContainer->layout()->removeWidget(label);
+        // 隐藏
+        label->hide();
+        // 放回空闲仓库
+        m_availableArrows.append(label);
     }
     // 清空箭头的列表
     m_arrowLabels.clear();
     // 清空UI的箭头显示
-    ui->resultLabel->clear();
     m_strategyMovie->stop(); // 只停止播放
-    // ui->resultLabel->clear();
-    ui->resultLabel->setText(""); // 用设置空字符串来代替 clear()，这样不会断开movie的连接
+    ui->resultLabel->clear();
+    // ui->resultLabel->setText(""); // 用设置空字符串来代替 clear()，这样不会断开movie的连接
     // 清理音效
     //m_audioManager->clearActiveSounds();
 }
@@ -204,6 +238,22 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 // 添加输入的箭头的函数
 void MainWindow::addArrow(Direction dir)
 {
+
+    // 创建并显示 QLabel
+    // 这里要注意，最终clear只clear了new QLabel对象的指针，QLabel对象本身还在，虽然说QLabel对象本身会在QT强大的对象树机制下被自动销毁
+    // 但是一旦离开QT的机制去写纯c++，这里就会发生内存泄露，因为new的QLabel对象会越堆积越多
+    // 其中一种方法是用传统派的方法，即手动内存管理，这个需要掌握
+    // 另外一种方法就是使用c++11的智能指针std::unique_ptr
+    // 这里使用手动精细化管理内存的手段，不再new新的label，而是从之前存在内存里的label中拿
+
+    //先检查空闲的箭头列表里还有没有label
+    if (m_availableArrows.isEmpty())
+    {
+        qDebug() <<"没箭头可用了";
+        return;
+    }
+    QLabel *arrowLabel = m_availableArrows.takeFirst();     // takeFirst()是QList的一个方法，它会移除并返回列表的第一个元素。一次操作，完成了“取出”和“从空闲列表删除”两件事。
+
     // 根据传入的 dir使用图片
     QString imagePath; // 声明一个字符串变量来存储图片路径
     switch (dir) {
@@ -221,10 +271,9 @@ void MainWindow::addArrow(Direction dir)
             break;
     }
 
-    // 创建并显示 QLabel
-    QLabel *arrowLabel = new QLabel(this);
     QPixmap arrowPixmap(imagePath);
-    if (arrowPixmap.isNull()) {
+    if (arrowPixmap.isNull())
+    {
         qDebug() << "错误：加载图片失败！路径：" << imagePath;
         delete arrowLabel; // 创建了但加载图片失败，就把它删掉，避免内存泄漏
         return; // 直接退出函数

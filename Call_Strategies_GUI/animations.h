@@ -33,6 +33,11 @@ public:
     // 静态方法：播放战备GIF
     // 参数：显示GIF的QLabel，控制GIF的QMovie，以及战备名
     static void playStrategyGif(QLabel* displayLabel, QMovie* movie, const QString& strategyName);
+    // 创建静态实例用以发射信号，提供一个公共的、获取唯一实例的方法
+    static Animations& instance();
+
+signals:
+    void pulseAnimationFinished();     // 告诉主窗口动画已经播完，可以开始清理
 
 private:
 

@@ -16,9 +16,11 @@
 #include <QPainter> // 引入强大的绘图工具 QPainter
 #include <QPixmapCache> // 引入 QPixmap 缓存，提升性能
 #include <QCoreApplication>
+#include <QWidget>
 
 class QLabel;     // 前向声明
 class QMovie;     // 前向声明
+class QWidget; // QWidget 也需要前向声明
 
 class Animations : public QObject
 {
@@ -35,6 +37,8 @@ public:
     static void playStrategyGif(QLabel* displayLabel, QMovie* movie, const QString& strategyName);
     // 创建静态实例用以发射信号，提供一个公共的、获取唯一实例的方法
     static Animations& instance();
+    // 滑动面板的函数
+    static void slidePanel(QWidget* panel, const QRect& endGeometry, int duration);
 
 signals:
     void pulseAnimationFinished();     // 告诉主窗口动画已经播完，可以开始清理

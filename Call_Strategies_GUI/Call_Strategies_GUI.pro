@@ -14,6 +14,7 @@ SOURCES += \
     inputmatchinglogic.cpp \
     main.cpp \
     mainwindow.cpp \
+    strategyitemwidget.cpp \
     strategymanager.cpp
 
 HEADERS += \
@@ -22,10 +23,12 @@ HEADERS += \
     inputmatchinglogic.h \
     mainwindow.h \
     strategyitem.h \
+    strategyitemwidget.h \
     strategymanager.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    strategyItemWidget.ui
 
 win32-msvc* {
     QMAKE_CXXFLAGS += /utf-8

@@ -71,18 +71,7 @@ void Animations::PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, co
     // 步骤 3: 动画结束后，用备份的 QMap 来恢复
     // 当动画播放完毕时，animationGroup 会通知 instance，然后 instance 会立刻向整个程序广播 pulseAnimationFinished() 这个信号
     QObject::connect(animationGroup, &QParallelAnimationGroup::finished, &instance(), &Animations::pulseAnimationFinished);
-                         /*
-    {
-//        for (auto it = originalPixmaps.constBegin(); it != originalPixmaps.constEnd(); ++it)
-//        {
-//            it.key()->setPixmap(it.value());
-//        }
-        for (QLabel *label : arrowLabels)
-        {
-            label->deleteLater(); // 动画结束
-        }
-    });
-*/
+
     animationGroup->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
@@ -110,5 +99,32 @@ void Animations::playStrategyGif(QLabel* displayLabel, QMovie* movie, const QStr
     movie->setFileName(gifPath);
     movie->start();
 }
+
+
+// 滑动弹出面板的函数
+void Animations::slidePanel(QWidget* panel, const QRect& endGeometry, int duration)
+{
+    // 安全检查
+    if (!panel)
+    {
+        qDebug() <<"没有面板";
+        return;
+    }
+
+    QPropertyAnimation *animation = new QPropertyAnimation(panel, "geometry");
+    animation->setDuration(duration);
+    animation->setStartValue(panel->geometry());
+    animation->setEndValue(endGeometry);
+    animation->setEasingCurve(QEasingCurve::OutCubic);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+
+
+
+
+
+
+
 
 

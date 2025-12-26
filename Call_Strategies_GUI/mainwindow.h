@@ -32,6 +32,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void showStrategyPanel();
+    void hideStrategyPanel();
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -64,6 +67,7 @@ private:
 
     QMovie *m_strategyMovie;
     bool m_isStrategyPanelShown;        //状态锁
+    const int PANEL_ANIMATION_DURATION = 100;
 
 };
 #endif // MAINWINDOW_H

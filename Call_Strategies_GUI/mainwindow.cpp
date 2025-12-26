@@ -166,6 +166,22 @@ void MainWindow::clearInputSequence()
     //m_audioManager->clearActiveSounds();
 }
 
+void MainWindow::showStrategyPanel()
+{
+    QWidget* panel = ui->StrategyPanel;
+    QRect endGeometry(0,0,200,400);
+    panel->setGeometry(-200,0,200,400);
+    panel->show();
+    Animations::slidePanel(panel, endGeometry, PANEL_ANIMATION_DURATION);
+}
+
+void MainWindow::hideStrategyPanel()
+{
+    QWidget* panel = ui->StrategyPanel;
+    QRect endGeometry(-200,0,200,400);
+    Animations::slidePanel(panel, endGeometry, PANEL_ANIMATION_DURATION);
+}
+
 //重写键盘输入事件
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -176,7 +192,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         {
             m_isStrategyPanelShown = true;
             // 显示面板
-            ui->StrategyPanel->show();
+            showStrategyPanel();
+            //ui->StrategyPanel->show();
         }
         // 只有按下CTRL并且确保上一个战备已经启动之后才能输入战备
         m_isInputLocked = false;
@@ -219,7 +236,8 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
         {
             m_isStrategyPanelShown = false;
             // 显示面板
-            ui->StrategyPanel->hide();
+            hideStrategyPanel();
+            //ui->StrategyPanel->hide();
         }
         // 松开CTRL，锁定战备输入，并且延迟销毁界面上的箭头
         if (!m_isInputLocked)

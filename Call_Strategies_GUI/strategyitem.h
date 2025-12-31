@@ -16,7 +16,7 @@ enum Direction {
 struct StrategyItem {
     QString name;
     QVector<Direction> sequence;
-
+    QString iconPath;       //  存图标
 };
 
 #endif // STRATEGYITEM_H

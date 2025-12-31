@@ -78,7 +78,6 @@ void InputMatchingLogic::checkSequenceMatch()
     }
 }
 
-
 // 超时后的清空逻辑
 void InputMatchingLogic::onInputTimeout()
 {
@@ -89,5 +88,10 @@ void InputMatchingLogic::onInputTimeout()
     }
 }
 
-
+// 清理真正的输入序列
+void InputMatchingLogic::clearSequence()
+{
+    m_inputSequence.clear();
+    m_inputTimer->stop(); // 把计时器也停掉，更保险
+}
 

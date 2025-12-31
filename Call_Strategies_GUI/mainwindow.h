@@ -17,6 +17,7 @@
 #include "strategymanager.h"
 #include "inputmatchinglogic.h"
 #include "animations.h"
+#include "strategyitemwidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,6 +35,7 @@ public:
 
     void showStrategyPanel();
     void hideStrategyPanel();
+    void updateStrategyPanel();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -67,7 +69,9 @@ private:
 
     QMovie *m_strategyMovie;
     bool m_isStrategyPanelShown;        //状态锁
-    const int PANEL_ANIMATION_DURATION = 100;
+    const int PANEL_ANIMATION_DURATION = 150;
+
+    QVector<StrategyItemWidget*> m_strategyPanelItems;      // 储存已选择的四个战备的对象池
 
 };
 #endif // MAINWINDOW_H

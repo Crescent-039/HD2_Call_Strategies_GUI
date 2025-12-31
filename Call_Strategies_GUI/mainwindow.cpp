@@ -69,7 +69,41 @@ MainWindow::MainWindow(QWidget *parent)
         m_availableArrows.append(arrow);        // 留在内存里等待被放进ArrowContainer里
     }
 
+    // 定义存放战备的对象此，每次四个战备
+    const int numstrategies = 6;
+    for (int i = 0; i < numstrategies; ++i)
+    {
+        StrategyItemWidget *itemWidget = new StrategyItemWidget(this);
+        m_strategyPanelItems.append(itemWidget);
+        ui->StrategyPanel->layout()->addWidget(itemWidget);
+    }
+    updateStrategyPanel();
+
 }
+
+// 填充选择的四个战备
+void MainWindow::updateStrategyPanel()
+{
+    // 从数据管理器获取已装备的战备列表
+    const auto& equippedStrategies = m_strategyManager->getEquippedStrategies();
+
+    // 遍历UI池 (m_strategyPanelItems)
+    for (int i = 0; i < m_strategyPanelItems.size(); ++i) {
+        StrategyItemWidget* itemWidget = m_strategyPanelItems[i];
+
+        // 判断数据是否存在
+        if (i < equippedStrategies.size()) {
+            // 如果数据列表里有这一项，就用数据更新UI，并显示它
+            qDebug() << "  > Updating UI item" << i << "with strategy:" << equippedStrategies[i].name;
+            itemWidget->setStrategy(equippedStrategies[i]);
+            //itemWidget->show();
+        } else {
+            //itemWidget->hide();
+        }
+    }
+
+}
+
 
 // 接受输入
 void MainWindow::onInputAccepted(Direction dir)
@@ -158,7 +192,8 @@ void MainWindow::clearInputSequence()
     }
     // 清空箭头的列表
     m_arrowLabels.clear();
-    // 清空UI的箭头显示
+    // 清理输入序列
+    m_inputMatchingLogic->clearSequence();
     m_strategyMovie->stop(); // 只停止播放
     ui->resultLabel->clear();
     // ui->resultLabel->setText(""); // 用设置空字符串来代替 clear()，这样不会断开movie的连接
@@ -166,11 +201,12 @@ void MainWindow::clearInputSequence()
     //m_audioManager->clearActiveSounds();
 }
 
+
 void MainWindow::showStrategyPanel()
 {
     QWidget* panel = ui->StrategyPanel;
-    QRect endGeometry(0,0,200,400);
-    panel->setGeometry(-200,0,200,400);
+    QRect endGeometry(0,0,290,400);
+    panel->setGeometry(-290,0,290,400);
     panel->show();
     Animations::slidePanel(panel, endGeometry, PANEL_ANIMATION_DURATION);
 }
@@ -178,9 +214,10 @@ void MainWindow::showStrategyPanel()
 void MainWindow::hideStrategyPanel()
 {
     QWidget* panel = ui->StrategyPanel;
-    QRect endGeometry(-200,0,200,400);
+    QRect endGeometry(-290,0,290,400);
     Animations::slidePanel(panel, endGeometry, PANEL_ANIMATION_DURATION);
 }
+
 
 //重写键盘输入事件
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -188,6 +225,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     // 按下CTRL显示战备面板
     if (event->key() == Qt::Key_Control)
     {
+        // 当event来自于auto-repeating key，isAutoRepeat返回true；当event事件来自于最初的按键，则sAutoRepeat返回false
         if (!event->isAutoRepeat()&&!m_isStrategyPanelShown)
         {
             m_isStrategyPanelShown = true;
@@ -235,17 +273,13 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
         if (!event->isAutoRepeat()&&m_isStrategyPanelShown)
         {
             m_isStrategyPanelShown = false;
-            // 显示面板
+            // 隐藏面板
             hideStrategyPanel();
             //ui->StrategyPanel->hide();
         }
         // 松开CTRL，锁定战备输入，并且延迟销毁界面上的箭头
-        if (!m_isInputLocked)
-            {
-                // 如果用户只是输入了一半，然后松开了 CTRL，在这里清理箭头
-                clearInputSequence();
-            }
-
+        // 如果用户只是输入了一半，然后松开了 CTRL，在这里清理箭头
+        clearInputSequence();
         m_isInputLocked = true;
         // m_delayClearArrow->start(1500);
         return;

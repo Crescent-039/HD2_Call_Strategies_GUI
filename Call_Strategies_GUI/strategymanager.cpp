@@ -9,6 +9,28 @@ StrategyManager::StrategyManager(QObject *parent)
     : QObject{parent}
 {
     load();
+
+    // 临时实验，选择前四个战备
+    if (m_strategies.size()>=6)
+    {
+        m_equippedStrategies.push_back(m_strategies[0]);
+        m_equippedStrategies.push_back(m_strategies[1]);
+        m_equippedStrategies.push_back(m_strategies[2]);
+        m_equippedStrategies.push_back(m_strategies[3]);
+        m_equippedStrategies.push_back(m_strategies[4]);
+        m_equippedStrategies.push_back(m_strategies[5]);
+    }
+}
+
+
+const QVector<StrategyItem>& StrategyManager::getStrategies() const
+{
+    return m_strategies; // 直接返回成员变量
+}
+
+const QVector<StrategyItem>& StrategyManager::getEquippedStrategies() const
+{
+    return m_equippedStrategies; // 直接返回“已装备列表”这个成员变量
 }
 
 // 载入战略配备的配置文件
@@ -35,6 +57,7 @@ void StrategyManager::load()
             QJsonObject jsonObj = value.toObject();
             StrategyItem newItem; // 创建一个新的战备“盒子”
             newItem.name = jsonObj["name"].toString();
+            newItem.iconPath = jsonObj["iconPath"].toString();
             QJsonArray sequenceArray = jsonObj["sequence"].toArray();
 
             for (const QJsonValue &seqValue : sequenceArray)
@@ -49,15 +72,10 @@ void StrategyManager::load()
         qDebug() << "成功加载" << m_strategies.count() << "个战备";
         for(const auto& strategy : m_strategies)
         {
-            qDebug() << "战备名:" << strategy.name << " 指令序列:" << strategy.sequence;
+            qDebug() << "战备名:" << strategy.name << " 指令序列:" << strategy.sequence << " 图标:" << strategy.iconPath;
         }
 }
 
-
-const QVector<StrategyItem>& StrategyManager::getStrategies() const
-{
-    return m_strategies; // 直接返回成员变量
-}
 
 
 

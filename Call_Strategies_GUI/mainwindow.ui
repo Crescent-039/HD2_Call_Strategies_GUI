@@ -64,13 +64,14 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>161</width>
+      <width>280</width>
       <height>351</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(56, 56, 56, 100);</string>
     </property>
+    <layout class="QVBoxLayout" name="verticalLayout"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

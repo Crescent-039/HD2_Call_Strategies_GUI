@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>strategyitemwidget</class>
- <widget class="QWidget" name="strategyitemwidget">
+ <class>StrategyItemWidget</class>
+ <widget class="QWidget" name="StrategyItemWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -38,23 +38,37 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 10pt &quot;微软雅黑&quot;;
+color:rgb(239, 239, 239);</string>
+   </property>
    <property name="text">
     <string>TextLabel</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
    </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
   </widget>
   <widget class="QWidget" name="ArrowsContainer" native="true">
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>40</y>
+     <y>39</y>
      <width>201</width>
-     <height>30</height>
+     <height>21</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+   <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+   </layout>
   </widget>
  </widget>
  <resources/>

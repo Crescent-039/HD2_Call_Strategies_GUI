@@ -17,6 +17,8 @@ public:
     // 构造函数需要传入 StrategyManager 的地址
     explicit InputMatchingLogic(StrategyManager *strategyManager, QObject *parent = nullptr);
 
+    void clearSequence();
+
 public slots:
     // 公共的槽，用来接收 MainWindow 的按键通知
     void onKeyPressed(Direction dir);

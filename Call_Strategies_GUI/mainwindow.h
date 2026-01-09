@@ -23,6 +23,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class QParallelAnimationGroup;
 class InputMatchingLogic;
 
 class MainWindow : public QMainWindow
@@ -36,6 +37,9 @@ public:
     void showStrategyPanel();
     void hideStrategyPanel();
     void updateStrategyPanel();
+
+public slots:
+    void onSequenceUpdated(const QVector<Direction>& currentSequence);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

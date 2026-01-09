@@ -22,9 +22,11 @@ void InputMatchingLogic::onKeyPressed(Direction dir)
     m_inputSequence.append(dir);
     // 广播输入已接受的信号，让UI画箭头
     emit inputAccepted(dir);
-    m_inputTimer->start(5000);
+    m_inputTimer->start(15000);
     // 检查输入的方向序列是否匹配上了某个战备
     checkSequenceMatch();
+    // 发射更新箭头的信号，让侧边栏箭头进行更新
+    emit sequenceUpdated(m_inputSequence);
 }
 
 
@@ -60,6 +62,7 @@ void InputMatchingLogic::checkSequenceMatch()
                 break; // 玩家输入的比配方还长，肯定不对
             }
             // 使用 std::equal 比较玩家输入序列是否和配方序列的开头部分完全相等
+            // std::equal元素比较算法中，第一个序列的元素个数决定了比较多少个对应的元素。
             if (std::equal(m_inputSequence.begin(), m_inputSequence.end(), strategy.sequence.begin()))
             {
                 isStillPossible = true; // 找到了一个可能性

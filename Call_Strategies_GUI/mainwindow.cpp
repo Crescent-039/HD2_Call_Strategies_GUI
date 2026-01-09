@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_inputMatchingLogic, &InputMatchingLogic::matchSuccess, this, &MainWindow::onMatchSuccess);
     connect(m_inputMatchingLogic, &InputMatchingLogic::matchFailed, this, &MainWindow::onMatchFailed);
     connect(m_inputMatchingLogic, &InputMatchingLogic::sequenceCleared, this, &MainWindow::clearInputSequence);
-
+    connect(m_inputMatchingLogic, &InputMatchingLogic::sequenceUpdated, this, &MainWindow::onSequenceUpdated);
     // 初始化输入锁为 false
     m_isInputLocked = true;
     // 创建延迟清除音效的计时器
@@ -101,9 +101,17 @@ void MainWindow::updateStrategyPanel()
             //itemWidget->hide();
         }
     }
-
 }
 
+// 更新界面上的箭头
+void MainWindow::onSequenceUpdated(const QVector<Direction>& currentSequence)
+{
+    // 遍历我们UI池里的所有 widget
+    for (StrategyItemWidget* itemWidget : m_strategyPanelItems) {
+        // 把最新的完整序列，通知给每一个 widget，让它们自己更新状态
+        itemWidget->updateMatchingStatus(currentSequence);
+    }
+}
 
 // 接受输入
 void MainWindow::onInputAccepted(Direction dir)
@@ -116,12 +124,23 @@ void MainWindow::onInputAccepted(Direction dir)
 void MainWindow::onMatchSuccess(const QString &strategyName)
 {
     m_isInputLocked = true;
-    //ui->resultLabel->setText(strategyName);
     m_audioManager->playKeyPressSound(AudioManager::MatchSuccess);// 播放音效
     // 上特技
     Animations::PulseAnimationForArrows(m_arrowLabels, Qt::cyan, this);
     Animations::playStrategyGif(ui->resultLabel, m_strategyMovie, strategyName);
+
+    // 遍历UI池，在正确的战备上显示正在启动
+    for (StrategyItemWidget* itemWidget : m_strategyPanelItems)
+    {
+        if (itemWidget->strategyName() == strategyName)
+        {
+            itemWidget->showAsLaunching();
+            break;
+        }
+    }
+
     m_delayClearAudio->start(3000);
+
     // 立刻销毁m_arrowLabels，否则会有一堆即将被Animations销毁的空指针
     // 同时将箭头回收利用
     // 不再需要 m_delayClearArrow，也不需要立刻 clear 列表了
@@ -180,6 +199,13 @@ void MainWindow::delayclearArrow()
 // 修改clearInputSequence，不再deleteLater任何东西，而是把使用中的箭头放回待命的箭头容器中
 void MainWindow::clearInputSequence()
 {
+
+    // --- 新增：重置所有战备面板条目的状态 ---
+    for (StrategyItemWidget* itemWidget : m_strategyPanelItems)
+    {
+        itemWidget->resetState();
+    }
+
     for (QLabel *label : m_arrowLabels)
     {
         //label->deleteLater();

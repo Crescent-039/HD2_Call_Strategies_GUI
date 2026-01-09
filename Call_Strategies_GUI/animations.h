@@ -21,6 +21,7 @@
 class QLabel;     // 前向声明
 class QMovie;     // 前向声明
 class QWidget; // QWidget 也需要前向声明
+class QParallelAnimationGroup;
 
 class Animations : public QObject
 {

@@ -73,6 +73,7 @@ void Animations::PulseAnimationForArrows(const QVector<QLabel*>& arrowLabels, co
     QObject::connect(animationGroup, &QParallelAnimationGroup::finished, &instance(), &Animations::pulseAnimationFinished);
 
     animationGroup->start(QAbstractAnimation::DeleteWhenStopped);
+
 }
 
 

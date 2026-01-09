@@ -18,10 +18,12 @@ public:
     explicit InputMatchingLogic(StrategyManager *strategyManager, QObject *parent = nullptr);
 
     void clearSequence();
-
-public slots:
     // 公共的槽，用来接收 MainWindow 的按键通知
     void onKeyPressed(Direction dir);
+
+public slots:
+
+
 
 signals:
     // 广播系统，向 MainWindow 报告事件
@@ -29,6 +31,7 @@ signals:
     void matchSuccess(const QString &strategyName); // const & 提高效率
     void matchFailed();
     void sequenceCleared();
+    void sequenceUpdated(const QVector<Direction>& currentSequence);
 
 private slots:
     // 私有的槽，用来响应计时器
